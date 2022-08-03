@@ -6,6 +6,9 @@ echo ■　sql-formatter-bat処理　開始
 echo ■　
 echo ■■■■■■■■■■■■■■■■■■■■
 
+rem カレントディレクトリ
+set CUR_DIR=%~dp0
+
 rem 引数チェック
 if "%1" EQU "" (
   echo ---------------------------------------------------------------
@@ -21,10 +24,10 @@ if "%1" EQU "" (
 rem 入力ファイル文字エンコーディング
 set inputFileEncode=UTF-8
 rem SQL Server
-set dialect=tsql
+set dialect=Tsql
 
 rem JAVA_HOME設定
-rem set PATH=[jdk8- directory you downloaded];%PATH%
+set PATH=C:\java\openjdk-11.0.2_windows-x64_bin\jdk-11.0.2\bin;%PATH%
 
 rem ==============================
 rem ＜説明＞指定引数
@@ -32,7 +35,7 @@ rem ------------------------------
 rem targetFile            :SqlFormat対象ファイルフルパス
 rem inputFileEncode       :ファイルエンコード（デフォルトUTF-8）
 rem ==============================
-java -cp %CD%\resources\prop;.\resources\lib\sqlformatterbat-0.0.1-SNAPSHOT-all.jar ^
+java -cp %CUR_DIR%\resources\prop;%CUR_DIR%\resources\lib\sqlformatterbat-0.0.1-SNAPSHOT-all.jar ^
   org.springframework.batch.core.launch.support.CommandLineJobRunner ^
   sqlformatterbat.job0010.AppConfig0010 sqlFormatterBatJob ^
   targetFile=%targetFile% ^
@@ -46,6 +49,5 @@ echo ■　sql-formatter-bat　終了
 echo ■　
 echo ■■■■■■■■■■■■■■■■■■■■
 
-pause
-rem exit
+exit
 

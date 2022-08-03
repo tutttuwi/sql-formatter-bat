@@ -7,6 +7,7 @@ import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,16 +73,21 @@ public class SqlFormatterBatTasklet implements Tasklet {
 
         String sql = Files.lines(Paths.get(targetFile), Charset.forName(inputFileEncode))
                 .collect(Collectors.joining(System.getProperty("line.separator")));
+        log.info("整形前クエリ：" + sql);
+//        String sqlFormatted = SqlFormatter.of(dialectSelected).format(sql);
         String sqlFormatted = SqlFormatter.of(dialectSelected).format(sql,
                 FormatConfig.builder().indent(prop.getIndent()) // Defaults to two spaces
                         .uppercase(prop.isUppercase()) // Defaults to false (not safe to use when SQL dialect has case-sensitive identifiers)
                         .linesBetweenQueries(prop.getLinesBetweenQueries()) // Defaults to 1
                         .maxColumnLength(prop.getMaxColumnLength()) // Defaults to 50
                         .build());
-        BufferedWriter bw = Files.newBufferedWriter(Paths.get(targetFile),
+        log.info("整形後クエリ：" + sqlFormatted);
+        BufferedWriter bw = Files.newBufferedWriter(Paths.get(targetFile + ".tmp"),
                 Charset.forName(inputFileEncode), StandardOpenOption.CREATE);
-        bw.append(sqlFormatted);
+        bw.write(sqlFormatted);
         bw.close();
+        Files.copy(Paths.get(targetFile + ".tmp"), Paths.get(targetFile), StandardCopyOption.REPLACE_EXISTING);
+        Files.delete(Paths.get(targetFile + ".tmp"));
         log.info("[END] SQL Format");
         return RepeatStatus.FINISHED;
     }
