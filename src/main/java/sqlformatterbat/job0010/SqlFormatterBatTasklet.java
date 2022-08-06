@@ -52,8 +52,7 @@ public class SqlFormatterBatTasklet implements Tasklet {
     Dialect dialectSelected;
 
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-            throws Exception {
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         // 初期処理
         setup();
         String indent = prop.getIndent();
@@ -71,23 +70,21 @@ public class SqlFormatterBatTasklet implements Tasklet {
         log.info("maxColumnLength:" + maxColumnLength);
         log.info("##################################################");
 
-        String sql = Files.lines(Paths.get(targetFile), Charset.forName(inputFileEncode))
-                .collect(Collectors.joining(System.getProperty("line.separator")));
+        String sql = Files.lines(Paths.get(targetFile), Charset.forName(inputFileEncode)).collect(Collectors.joining(System.getProperty("line.separator")));
         log.info("整形前クエリ：" + sql);
 //        String sqlFormatted = SqlFormatter.of(dialectSelected).format(sql);
-        String sqlFormatted = SqlFormatter.of(dialectSelected).format(sql,
-                FormatConfig.builder().indent(prop.getIndent()) // Defaults to two spaces
-                        .uppercase(prop.isUppercase()) // Defaults to false (not safe to use when SQL dialect has case-sensitive identifiers)
-                        .linesBetweenQueries(prop.getLinesBetweenQueries()) // Defaults to 1
-                        .maxColumnLength(prop.getMaxColumnLength()) // Defaults to 50
-                        .build());
+        String sqlFormatted = SqlFormatter.of(dialectSelected).format(sql, FormatConfig.builder().indent(prop.getIndent()) // Defaults to two spaces
+                .uppercase(prop.isUppercase()) // Defaults to false (not safe to use when SQL dialect has case-sensitive identifiers)
+                .linesBetweenQueries(prop.getLinesBetweenQueries()) // Defaults to 1
+                .maxColumnLength(prop.getMaxColumnLength()) // Defaults to 50
+                .build());
         log.info("整形後クエリ：" + sqlFormatted);
-        BufferedWriter bw = Files.newBufferedWriter(Paths.get(targetFile + ".tmp"),
-                Charset.forName(inputFileEncode), StandardOpenOption.CREATE);
+        // デフォルトオプションで開く：StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,StandardOpenOption.WRITE
+        BufferedWriter bw = Files.newBufferedWriter(Paths.get(targetFile), Charset.forName(inputFileEncode));
         bw.write(sqlFormatted);
         bw.close();
-        Files.copy(Paths.get(targetFile + ".tmp"), Paths.get(targetFile), StandardCopyOption.REPLACE_EXISTING);
-        Files.delete(Paths.get(targetFile + ".tmp"));
+//        Files.copy(Paths.get(targetFile + ".tmp"), Paths.get(targetFile), StandardCopyOption.REPLACE_EXISTING);
+//        Files.delete(Paths.get(targetFile + ".tmp"));
         log.info("[END] SQL Format");
         return RepeatStatus.FINISHED;
     }

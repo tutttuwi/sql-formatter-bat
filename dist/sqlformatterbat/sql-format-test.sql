@@ -1,5 +1,8 @@
 SELECT
-  *
+  *,
+  a,
+  b,
+  c
 FROM
   test_table AS TEST(NOLOCK)
   LEFT JOIN fruit AS F(nolock) ON F.key = TEST.key
@@ -9,7 +12,7 @@ ORDER BY
   KEY;
 
 INSERT INTO
-  test
+  test.a.b
 VALUES
   (1, 2, 3);
 
@@ -17,7 +20,7 @@ VALUES
 DELETE TEST
 */
 DELETE FROM
-  test
+  test.a.b
 WHERE
   delFlg = 1;
 
